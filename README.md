@@ -1,5 +1,5 @@
 <h1 align="center">
-** kaggle 데이터를 이용한 빅마트의 상품 가격 예측 **
+kaggle 데이터를 이용한 빅마트의 상품 가격 예측 
 </h1>
 
 저의 첫번째 repo입니다. :blush:  

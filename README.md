@@ -1,6 +1,6 @@
-<p align="center">
+<h1 align="center">
 ** kaggle 데이터를 이용한 빅마트의 상품 가격 예측 **
-</p>
+</h1>
 
 저의 첫번째 repo입니다. :blush:  
 캐글에 등록되어 있는 데이터 셋으로 분석을 진행하였습니다.  

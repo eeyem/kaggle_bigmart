@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Seo Yu Jeong">
+<meta name="dcterms.date" content="2021-02-09">
+
+<title>빅마트의 상품 가격 예측</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="Project_bigmart_syj_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Project_bigmart_syj_files/libs/quarto-html/quarto.js"></script>
+<script src="Project_bigmart_syj_files/libs/quarto-html/popper.min.js"></script>
+<script src="Project_bigmart_syj_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Project_bigmart_syj_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Project_bigmart_syj_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Project_bigmart_syj_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Project_bigmart_syj_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Project_bigmart_syj_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Project_bigmart_syj_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+<script src="Project_bigmart_syj_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="Project_bigmart_syj_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description">Description</a></li>
+  <li><a href="#pre-processing" id="toc-pre-processing" class="nav-link" data-scroll-target="#pre-processing">Pre-processing</a></li>
+  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a></li>
+  <li><a href="#modeling" id="toc-modeling" class="nav-link" data-scroll-target="#modeling">Modeling</a></li>
+  <li><a href="#prediction-and-evaluation" id="toc-prediction-and-evaluation" class="nav-link" data-scroll-target="#prediction-and-evaluation">Prediction and Evaluation</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">빅마트의 상품 가격 예측</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Seo Yu Jeong </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 9, 2021</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-1_20a8e9e84929f1de7d8700b300afa162">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DescTools) </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>본 프로젝트에서 사용된 패키지입니다. 분석을 진행하면서 함수에 대한 간략한 설명도 진행하겠습니다.</p>
+<section id="description" class="level2">
+<h2 class="anchored" data-anchor-id="description">Description</h2>
+<p>kaggle에 등록되어 있는 데이터셋 <a href="https://www.kaggle.com/datasets/akashdeepkuila/big-mart-sales"><strong>BIG MART SALES PREDICTION</strong></a> 으로 BigMart의 <strong>상품 데이터를 이용하여 가격을 예측</strong>하는 것이 목적입니다. 데이터는 각 다른 도시에 있는 10개의 마트의 1559개 상품에 대한 정보로 2013년에 수집되었습니다.</p>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-2_0df62213a500557351759bd5969a24a0">
+
+</div>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-3_70f1dd3d2081bd537f50ae6f2bd03a62">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Train_Sales.csv"</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Test_Sales.csv"</span>) </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>Item_Outlet_Sales <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(test))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 결측값 대치 전 분포를 비교하기 위한 데이터셋</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>un_big <span class="ot">&lt;-</span> <span class="fu">rbind</span>(train, test) </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>big <span class="ot">&lt;-</span> <span class="fu">rbind</span>(train, test)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>train <span class="sc">|&gt;</span> <span class="fu">dim</span>(); test <span class="sc">|&gt;</span> <span class="fu">dim</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8523   12</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5681   12</code></pre>
+</div>
+</div>
+<ul>
+<li>train set과 test set은 각 8523행, 5681행으로 이루어져 있습니다.</li>
+<li>전처리를 진행하기 위해 두 데이터를 결합(= big)하고 진행하도록 하겠습니다.</li>
+<li>독립변수(X)의 설명은 다음과 같습니다.</li>
+</ul>
+<table class="table">
+<thead>
+<tr class="header">
+<th>변수명</th>
+<th>변수설명</th>
+<th>유형</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Item_Identifier</td>
+<td>상품 ID</td>
+<td>연속형</td>
+</tr>
+<tr class="even">
+<td>Item_Weight</td>
+<td>상품 무게</td>
+<td>연속형</td>
+</tr>
+<tr class="odd">
+<td>Item_Fat_Content</td>
+<td>지방 함량 수준</td>
+<td>범주형</td>
+</tr>
+<tr class="even">
+<td>Item_Visibility</td>
+<td>점유공간(%)</td>
+<td>연속형</td>
+</tr>
+<tr class="odd">
+<td>Item_Type</td>
+<td>상품 카테고리</td>
+<td>범주형</td>
+</tr>
+<tr class="even">
+<td>Item_MRP</td>
+<td>최대 소매가</td>
+<td>연속형</td>
+</tr>
+<tr class="odd">
+<td>Outlet_Identifier</td>
+<td>마트 ID</td>
+<td>범주형</td>
+</tr>
+<tr class="even">
+<td>Outlet_Establishment_Year</td>
+<td>마트 설립연도</td>
+<td>연속형</td>
+</tr>
+<tr class="odd">
+<td>Outlet_Size</td>
+<td>마트 규모</td>
+<td>범주형</td>
+</tr>
+<tr class="even">
+<td>Outlet_Location_Type</td>
+<td>마트가 위치한 도시 규모</td>
+<td>범주형</td>
+</tr>
+<tr class="odd">
+<td>Outlet_Type</td>
+<td>마트 분류</td>
+<td>범주형</td>
+</tr>
+<tr class="even">
+<td>Item_Outlet_Sales</td>
+<td><strong>상품가격 - 반응변수(Y)</strong></td>
+<td>연속형</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="pre-processing">Pre-processing</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">1. Missing value</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">2. 마트 규모</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">3. 상품 무게</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">4. Visualizing imputed data</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>변수들의 결측값 현황을 살펴보고, 결측값이 있는 변수에 대해 탐색해보겠습니다.</p>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-4_3669d5833e4df7838be18fd7f8449e8d">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(big)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kbl</span>(<span class="at">col.names =</span> <span class="st">"결측값 수"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> 결측값 수 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Item_Identifier </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Item_Weight </td>
+   <td style="text-align:right;"> 2439 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Item_Fat_Content </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Item_Visibility </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Item_Type </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Item_MRP </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Outlet_Identifier </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Outlet_Establishment_Year </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Outlet_Size </td>
+   <td style="text-align:right;"> 4016 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Outlet_Location_Type </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Outlet_Type </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Item_Outlet_Sales </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<ul>
+<li><p>{<a href="https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html#Overview">kableExtra</a>}패키지는 knitr::kable()으로 생성된 기본적인 Table에 다양한 Style을 제공해주기 위한 패키지입니다.</p></li>
+<li><p>데이터에서 결측값은 <strong>상품 무게(Item_Identifier)</strong>와 <strong>마트 규모(Outlet_Size)변수</strong>에서 발생하였으며, 각 변수에서 2439개/4016개의 결측값을 확인하였습니다.</p></li>
+</ul>
+<p>전체 데이터에서 결측값의 비율을 계산해보았습니다.</p>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-5_4e3324f5bc9a859e2c6d845cfe4f7798">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>custom_palette <span class="ot">&lt;-</span> <span class="fu">brewer.pal</span>(<span class="dv">3</span>,<span class="st">"Set2"</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>naniar<span class="sc">::</span><span class="fu">miss_var_summary</span>(big) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(n_miss <span class="sc">!=</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(variable, pct_miss)) <span class="sc">+</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> variable)) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(pct_miss, <span class="dv">1</span>)), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_discrete</span>(<span class="at">label =</span> <span class="fu">c</span>(<span class="st">"상품 무게"</span>, <span class="st">"마트 규모"</span>)) <span class="sc">+</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>), <span class="at">breaks =</span> <span class="fu">c</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="dv">10</span>)),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">labels =</span> <span class="fu">c</span>(<span class="fu">paste</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">100</span>, <span class="dv">10</span>), <span class="st">"%"</span>))</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                     ) <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> custom_palette) <span class="sc">+</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>, </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">size =</span> <span class="dv">15</span>, <span class="at">color =</span> <span class="st">"darkblue"</span>)) <span class="sc">+</span> </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Missing(%)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<ul>
+<li><p>{<a href="https://github.com/njtierney/naniar">naniar</a>}패키지는 missing data에 대해 요약 및 시각화 기능을 제공해줍니다.</p></li>
+<li><p>데이터 전체에서 <strong>상품 무게(Item_Identifier)</strong>와 <strong>마트 규모(Outlet_Size)</strong>의 결측값 비율은17.2%/28.3% 를 차지하고 있습니다.</p></li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Outlet_Size(마트 규모)에 대한 결측값 대치를 수행합니다.</p>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-6_e7a0503f22995e696b75457d99f22786">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>big <span class="sc">%&gt;%</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Outlet_Identifier<span class="sc">:</span>Item_Outlet_Sales) <span class="sc">%&gt;%</span>  </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Outlet_Identifier, Outlet_Size) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(Outlet_Identifier, n)) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Outlet_Size)) <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> n), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#scale_y_discrete(labels = rep("",4)) +</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"마트 ID"</span>, <span class="at">y =</span> <span class="st">"상품 수"</span>, <span class="at">fill =</span> <span class="st">"마트 규모"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<ul>
+<li><p>10개 마트(Outlet_Identifier)의 각 규모(Outlet_Size)를 보여주기 위한 그림으로 y축은 마트에서 보유한 상품의 수를 나타냅니다. 이 때, 상품은 진열된 상품의 수 이므로 중복된 상품이 포함됩니다.</p></li>
+<li><p>위 그림에서 3개 마트(OUT010, OUT017, OUT045)에 대한 규모 정보가 누락된 것을 확인하였습니다. 상대적으로 마트규모가 작을 때 상품 수가 작은 것으로 보아, OUT10 마트의 규모는 Small일 것이라고 추측할 수 있습니다.</p></li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-7_df056edce387017cec11f46d55940116">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>big <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Outlet_Identifier<span class="sc">:</span>Item_Outlet_Sales) <span class="sc">%&gt;%</span>  </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Outlet_Type, Outlet_Size) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kbl</span>(<span class="at">col.names=</span><span class="fu">c</span>(<span class="st">"마트 분류"</span>, <span class="st">"마트 규모"</span>, <span class="st">"상품 수"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">2</span>, <span class="at">color =</span> <span class="fu">spec_color</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> 마트 분류 </th>
+   <th style="text-align:left;"> 마트 규모 </th>
+   <th style="text-align:right;"> 상품 수 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Grocery Store </td>
+   <td style="text-align:left;color: rgba(68, 1, 84, 1) !important;"> Small </td>
+   <td style="text-align:right;"> 880 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Grocery Store </td>
+   <td style="text-align:left;color: rgba(253, 231, 37, 1) !important;"> NA </td>
+   <td style="text-align:right;"> 925 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type1 </td>
+   <td style="text-align:left;color: rgba(68, 1, 84, 1) !important;"> High </td>
+   <td style="text-align:right;"> 1553 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type1 </td>
+   <td style="text-align:left;color: rgba(68, 1, 84, 1) !important;"> Medium </td>
+   <td style="text-align:right;"> 1550 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type1 </td>
+   <td style="text-align:left;color: rgba(68, 1, 84, 1) !important;"> Small </td>
+   <td style="text-align:right;"> 3100 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type1 </td>
+   <td style="text-align:left;color: rgba(253, 231, 37, 1) !important;"> NA </td>
+   <td style="text-align:right;"> 3091 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type2 </td>
+   <td style="text-align:left;color: rgba(68, 1, 84, 1) !important;"> Medium </td>
+   <td style="text-align:right;"> 1546 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type3 </td>
+   <td style="text-align:left;color: rgba(68, 1, 84, 1) !important;"> Medium </td>
+   <td style="text-align:right;"> 1559 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<ul>
+<li><p>누락된 마트 규모를 추측하기 위해 다른 각도인 마트분류별로 살펴보겠습니다.</p></li>
+<li><p>마트분류(Outlet_Type)에 따른 마트규모(Outlet_Size)의 상품 수를 보면 <strong>Grocery Store</strong>과 <strong>Supermarket Type1</strong>에서 <strong>NA가 발생</strong>한 것을 알 수 있습니다. 이를 통해 Grocery Store의 경우 마트규모가 모두 작을 것이라고 생각할 수 있고, Supermarket Type1의 경우 마트규모가 다양하여 좀 더 살펴보아야 할 것 같습니다.</p></li>
+<li><p>마트가 위치한 도시규모(Outlet_Location_Type)변수를 추가로 고려하여 가설을 내리고 탐색해보도록 하겠습니다.</p>
+<ul>
+<li><p>가설 1 : 마트분류에 따라 규모가 제한될 수 있다. 이를 테면, 동네 슈퍼와 같은 경우 보편적으로 작게 운영되기 때문이다.</p></li>
+<li><p>가설 2 : 같은 맥락에서 마트가 위치한 도시규모와 마트분류에 따라 규모가 제한될 수 있다.</p></li>
+<li><p>검정 : 두 이산형 변수의 연관성 척도인 Cramer’s V로 판단 <span class="math display">\[Cramer's \; V = \sqrt{\frac{\chi^2}{N \times (min(m,p)-1)}}\]</span></p></li>
+</ul></li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-8_a7dafb0f93442831a26e7ac532f51bf2">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#마트 규모와 마트 분류의 상관계수</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">ftable</span>(big<span class="sc">$</span>Outlet_Size, big<span class="sc">$</span>Outlet_Type)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>DescTools<span class="sc">::</span><span class="fu">CramerV</span>(tab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5527004</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#마트 규모와 마트가 위치한 도시규모의 상관계수</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tab2 <span class="ot">&lt;-</span> <span class="fu">ftable</span>(big<span class="sc">$</span>Outlet_Size, big<span class="sc">$</span>Outlet_Location_Type)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>DescTools<span class="sc">::</span><span class="fu">CramerV</span>(tab2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5787653</code></pre>
+</div>
+</div>
+<ul>
+<li>Cramer’s V가 각 0.5849, 0.5310 값을 가지며 두 변수가 중간 정도의 상관이 있다고 할 수 있습니다.</li>
+</ul>
+<section id="grocery-store" class="level4">
+<h4 class="anchored" data-anchor-id="grocery-store">(1) Grocery Store</h4>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-9_60d728811d80042c21e27831151c1983">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>big[<span class="fu">which</span>(big<span class="sc">$</span>Outlet_Type<span class="sc">==</span><span class="st">"Grocery Store"</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(big<span class="sc">$</span>Outlet_Size)), <span class="st">"Outlet_Size"</span>] <span class="ot">&lt;-</span> <span class="st">"Small"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>앞서 마트분류(Outlet_Type)에 따른 마트규모(Outlet_Size)의 분포를 보면 마트분류(Outlet_Type)가 Grocery인 경우, NA값을 제외한 모든 데이터의 <strong>마트규모(Outlet_Size)는 모두 Small</strong>이므로 결측값을 <strong>Small로 대치</strong>하였습니다.</li>
+</ul>
+</section>
+<section id="supermarket-type1" class="level4">
+<h4 class="anchored" data-anchor-id="supermarket-type1">(2) Supermarket Type1</h4>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-10_be89005b099d084230179aa3641be49d">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>big <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Outlet_Type <span class="sc">==</span> <span class="st">"Supermarket Type1"</span>, Outlet_Location_Type <span class="sc">==</span> <span class="st">"Tier 2"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Outlet_Type, Outlet_Location_Type, Outlet_Size) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kbl</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"마트분류"</span>, <span class="st">"마트가 위치한 도시규모"</span>, <span class="st">"마트규모"</span>,<span class="st">"n"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> 마트분류 </th>
+   <th style="text-align:left;"> 마트가 위치한 도시규모 </th>
+   <th style="text-align:left;"> 마트규모 </th>
+   <th style="text-align:right;"> n </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type1 </td>
+   <td style="text-align:left;"> Tier 2 </td>
+   <td style="text-align:left;"> Small </td>
+   <td style="text-align:right;"> 1550 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Supermarket Type1 </td>
+   <td style="text-align:left;"> Tier 2 </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 3091 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<ul>
+<li><p>같은 접근방식으로 마트분류(Outlet_Type)가 Supermarket Type1인 경우, 마트규모(Outlet_Size)는 3종류 모두 존재하기 때문에 추가적으로 마트가 위치한 <strong>도시규모 변수(Outlet_Location_Type)</strong>를 살펴보았습니다.</p></li>
+<li><p><strong>Supermarket Type1에서 결측이 발생한 데이터는 모두 Tier2에 해당하며, Tier2인 도시규모에서는 Supermarket Type1의 규모는 모두 Small임</strong>을 알 수 있었습니다.</p></li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-11_9c5d9482cdc633c75941cea0f7f15752">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>big[<span class="fu">which</span>(big<span class="sc">$</span>Outlet_Type<span class="sc">==</span><span class="st">"Supermarket Type1"</span> <span class="sc">&amp;</span> <span class="fu">is.na</span>(big<span class="sc">$</span>Outlet_Size)), <span class="st">"Outlet_Size"</span>] <span class="ot">&lt;-</span> <span class="st">"Small"</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#colSums(is.na(big))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>따라서, <strong>Supermaket Type1</strong>에서 발생한 NA는 <strong>Small로 대치</strong>하였습니다.</li>
+</ul>
+</section>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Item_Weight(상품 무게)에 대한 결측값 대치를 수행합니다.</p>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-12_1da730f35c4ddc7f6e62921bf66718e8">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#무게가 NA인 상품명</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>NA_Item_Identifier <span class="ot">&lt;-</span> big <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(Item_Weight)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Item_Identifier) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>()</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#동일 제품의 평균을 구함</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>weight_mean <span class="ot">&lt;-</span> big <span class="sc">%&gt;%</span> </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Item_Weight)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Item_Identifier <span class="sc">%in%</span> NA_Item_Identifier) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Item_Identifier) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(Item_Weight)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>무게가 결측인 상품 id를 추출한 후, 값이 존재하는 <strong>동일 상품에 대해 평균무게</strong>를 구합니다.</li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-13_dbc2c26bd5be7c61fd7a09e534ec8df7">
+<div class="cell-output-display">
+
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> 상품 ID </th>
+   <th style="text-align:right;"> Mean </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> DRA12 </td>
+   <td style="text-align:right;"> 11.600 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DRA24 </td>
+   <td style="text-align:right;"> 19.350 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DRA59 </td>
+   <td style="text-align:right;"> 8.270 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DRB01 </td>
+   <td style="text-align:right;"> 7.390 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> DRB13 </td>
+   <td style="text-align:right;"> 6.115 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<ul>
+<li>무게(Item_Weight)가 결측인 상품은 총 1559개입니다(5개만 보여짐).</li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-14_23598cd471afa90c2655eee4523c576c">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#상품 ID에 대한 평균무게로 결측값 대치</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>big[<span class="fu">which</span>(<span class="fu">is.na</span>(big<span class="sc">$</span>Item_Weight)), <span class="st">"Item_Weight"</span>] <span class="ot">&lt;-</span> big <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(Item_Weight)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Item_Identifier, Item_Weight) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(weight_mean, <span class="at">by =</span> <span class="st">"Item_Identifier"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">Item_Weight =</span> mean)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(big))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          Item_Identifier               Item_Weight          Item_Fat_Content 
+                        0                         0                         0 
+          Item_Visibility                 Item_Type                  Item_MRP 
+                        0                         0                         0 
+        Outlet_Identifier Outlet_Establishment_Year               Outlet_Size 
+                        0                         0                         0 
+     Outlet_Location_Type               Outlet_Type         Item_Outlet_Sales 
+                        0                         0                         0 </code></pre>
+</div>
+</div>
+<ul>
+<li>동일한 상품에 대한 평균 무게로 결측값을 대치하였으며, 더 이상의 결측이 없음을 확인하였습니다.</li>
+</ul>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p>결측값 대치 전/후의 분포를 비교해봅시다.</p>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-15_d1d20a1592393b2c8ecc479050f06c0e">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Item_Weight 분포</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>unimputed_wt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(un_big, <span class="fu">aes</span>(<span class="at">x=</span>Item_Weight)) <span class="sc">+</span>  <span class="co">#결측값 대치 전</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>, <span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">stat=</span><span class="st">"density"</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"상품무게"</span>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>imputed_wt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(big, <span class="fu">aes</span>(<span class="at">x=</span>Item_Weight)) <span class="sc">+</span>   <span class="co">#결측값 대치 후</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">fill=</span><span class="st">"blue"</span>, <span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">stat=</span><span class="st">"density"</span>) <span class="sc">+</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"상품무게"</span>)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>cowplot<span class="sc">::</span><span class="fu">ggdraw</span>() <span class="sc">+</span>             <span class="co"># ggarrange(unimputed_wt, imputed_wt){ggpubr}</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_plot</span>(unimputed_wt, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">width =</span> .<span class="dv">5</span>, <span class="at">height =</span> .<span class="dv">95</span>) <span class="sc">+</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_plot</span>(imputed_wt, <span class="at">x =</span> <span class="fl">0.5</span>, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">width =</span> .<span class="dv">5</span>, <span class="at">height =</span> .<span class="dv">95</span>) <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_plot_label</span>(<span class="at">label =</span> <span class="fu">c</span>(<span class="st">"unimputed"</span>, <span class="st">"imputed"</span>), <span class="at">size =</span> <span class="dv">15</span>,</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<ul>
+<li><p>{<a href="https://cran.r-project.org/web/packages/cowplot/vignettes/introduction.html">cowplot</a>}패키지는 ggplot에 대한 간단한 추가 기능을 제공해줍니다.</p></li>
+<li><p>Item_Weight(상품 무게)의 결측값 대치 전/후 분포이며, 분포에 큰 차이가 보이지 않습니다.</p></li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-16_cbb750830005523c1e6fa91e49088469">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Outlet_Size에 따른 가격 분포</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>unimputed_size <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(un_big, <span class="fu">aes</span>(<span class="at">x =</span> Item_Outlet_Sales, <span class="at">y =</span> Outlet_Size, <span class="at">fill =</span> Outlet_Size)) <span class="sc">+</span>  <span class="co"># 결측값 대치 전</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  ggridges<span class="sc">::</span><span class="fu">geom_density_ridges2</span>(<span class="at">scale=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>imputed_size <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(big, <span class="fu">aes</span>(<span class="at">x =</span> Item_Outlet_Sales, <span class="at">y =</span> Outlet_Size, <span class="at">fill =</span> Outlet_Size)) <span class="sc">+</span>  <span class="co"># 결측값 대치 후</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges2</span>(<span class="at">scale=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggdraw</span>() <span class="sc">+</span>             <span class="co"># ggarrange(unimputed_size, imputed_size)</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_plot</span>(unimputed_size, <span class="at">x =</span> <span class="dv">0</span>, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">width =</span> .<span class="dv">5</span>, <span class="at">height =</span> .<span class="dv">95</span>) <span class="sc">+</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_plot</span>(imputed_size, <span class="at">x =</span> <span class="fl">0.5</span>, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">width =</span> .<span class="dv">5</span>, <span class="at">height =</span> .<span class="dv">95</span>, ) <span class="sc">+</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">draw_plot_label</span>(<span class="at">label =</span> <span class="fu">c</span>(<span class="st">"unimputed"</span>, <span class="st">"imputed"</span>), <span class="at">size =</span> <span class="dv">15</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>                  <span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+<ul>
+<li><p>{<a href="https://cran.r-project.org/web/packages/ggridges/vignettes/introduction.html">ggridge</a>}패키지는 geom_ridgeline과 geom_density_ridges 함수를 제공하는데, 전자는 높이(height)에 따른 선을 그리며, 후자는 데이터의 밀도함수를 추정하여 그려줍니다.</p></li>
+<li><p>Outlet_Size(마트 규모)의 결측값 대치 전/후 분포이며, 분포에 큰 차이가 보이지 않습니다.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="eda" class="level2">
+<h2 class="anchored" data-anchor-id="eda">EDA</h2>
+<ul>
+<li>탐색적 자료 분석을 통해 인사이트를 얻어보도록 하겠습니다.</li>
+</ul>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">1. 가격분포</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">2. 마트 분류별 가격 분포</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">3. 마트 분류별 상품 카테고리의 가격 분포</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-17_2b51c7799197493e34a6a89d30412ef1">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(big, <span class="fu">aes</span>(<span class="at">x=</span>Item_Outlet_Sales, <span class="at">fill =</span> Item_Type)) <span class="sc">+</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>( <span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>( <span class="sc">~</span> Item_Type) <span class="sc">+</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"상품가격"</span>) <span class="sc">+</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
+<li><p>상품 카테고리별 가격의 분포를 나타낸 그림으로 모두 왼쪽(낮은 가격)으로 치우쳐진 형태를 가집니다.</p></li>
+<li><p>Seafood의 경우 다른 종류들보다 가격대가 조금 높은 것으로 보입니다.</p></li>
+</ul>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-18_634ec03c1c67c476f7fcaa8c2190025f">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(big, <span class="fu">aes</span>(<span class="at">x =</span> Item_Outlet_Sales, <span class="at">y =</span> Outlet_Type, <span class="at">fill =</span> Outlet_Type)) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges2</span>(<span class="at">scale=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"상품가격"</span>, <span class="at">y =</span> <span class="st">"마트분류"</span>) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
+<li>Outlet_Type(마트 분류)별 가격분포를 보면 Grocery Store는 다른 Supermarket보다 가격대가 낮은 상품을 많이 파는 것을 알 수 있습니다.</li>
+</ul>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-19_a2b6bb68217b88f024d72921621c657e">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_classic</span>())</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(big, <span class="fu">aes</span>(<span class="at">x =</span> Item_Outlet_Sales, <span class="at">y =</span> Item_Type, <span class="at">fill =</span> Item_Type)) <span class="sc">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges2</span>(<span class="at">scale=</span><span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)<span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(<span class="sc">~</span> Outlet_Type) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"상품가격"</span>, <span class="at">y =</span> <span class="st">"상품 카테고리"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Project_bigmart_syj_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<ul>
+<li>위의 결과와 마찬가지로 Grocery Store에서 특히 가격대가 낮으며, supermarket 1 &lt; supermarket 2 &lt; supermarket 3 으로 가격대의 분포가 넓어지고 있습니다. 즉, supermarket 3의 마트 규모는 백화점, 대형마트 정도일 것으로 추측할 수 있습니다.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="modeling" class="level2 tabset">
+<h2 class="tabset anchored" data-anchor-id="modeling">Modeling</h2>
+<p>데이터에 대해 모델링을 수행해봅시다.</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">1. Split data</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">2. Standardization and dummy variable</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false" href="">3. Hyperparameter and Ridge, Lasso</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-20_c530d9bdc547a9323507600caf869141">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8523   12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>pro_train <span class="ot">&lt;-</span> big <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(train))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>pro_test <span class="ot">&lt;-</span> big <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="fu">nrow</span>(train)<span class="sc">+</span><span class="dv">1</span><span class="sc">:</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>전처리 후, train set과 test set을 나눠줍니다.</li>
+<li>slice 함수는 데이터의 위치정보를 사용하여 행을 추출할 수 있도록 도와줍니다.</li>
+</ul>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-21_8794d9b38cdd622309f6e9b0e2db3a1b">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardization</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>pre <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">preProcess</span>(pro_train, <span class="at">method =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)) </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>scale_train <span class="ot">&lt;-</span> <span class="fu">predict</span>(pre, pro_train)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>pre2 <span class="ot">&lt;-</span> <span class="fu">preProcess</span>(pro_test, <span class="at">method =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)) </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>scale_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(pre, pro_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Ridge와 Lasso 회귀는 <strong>독립변수의 scale에 영향을 받기 때문에</strong> 변수를 표준화시켜 주어야합니다.</li>
+</ul>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-22_ece14f8f37a496f0b9d65da56c45095f">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#train</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>dmy <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(Item_Outlet_Sales <span class="sc">~</span> ., <span class="at">data=</span>scale_train[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">7</span>)], <span class="at">fullrank=</span><span class="cn">TRUE</span>)  <span class="co"># train</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>dmy_train <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">predict</span>(dmy, <span class="at">newdata=</span>scale_train))</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>dmy_train<span class="sc">$</span>Item_Outlet_Sales <span class="ot">&lt;-</span> train<span class="sc">$</span>Item_Outlet_Sales</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>dmy_train <span class="sc">%&gt;%</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kbl</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> Item_Weight </th>
+   <th style="text-align:right;"> Item_Fat_ContentLF </th>
+   <th style="text-align:right;"> Item_Fat_Contentlow.fat </th>
+   <th style="text-align:right;"> Item_Fat_ContentLow.Fat </th>
+   <th style="text-align:right;"> Item_Fat_Contentreg </th>
+   <th style="text-align:right;"> Item_Fat_ContentRegular </th>
+   <th style="text-align:right;"> Item_Visibility </th>
+   <th style="text-align:right;"> Item_TypeBaking.Goods </th>
+   <th style="text-align:right;"> Item_TypeBreads </th>
+   <th style="text-align:right;"> Item_TypeBreakfast </th>
+   <th style="text-align:right;"> Item_TypeCanned </th>
+   <th style="text-align:right;"> Item_TypeDairy </th>
+   <th style="text-align:right;"> Item_TypeFrozen.Foods </th>
+   <th style="text-align:right;"> Item_TypeFruits.and.Vegetables </th>
+   <th style="text-align:right;"> Item_TypeHard.Drinks </th>
+   <th style="text-align:right;"> Item_TypeHealth.and.Hygiene </th>
+   <th style="text-align:right;"> Item_TypeHousehold </th>
+   <th style="text-align:right;"> Item_TypeMeat </th>
+   <th style="text-align:right;"> Item_TypeOthers </th>
+   <th style="text-align:right;"> Item_TypeSeafood </th>
+   <th style="text-align:right;"> Item_TypeSnack.Foods </th>
+   <th style="text-align:right;"> Item_TypeSoft.Drinks </th>
+   <th style="text-align:right;"> Item_TypeStarchy.Foods </th>
+   <th style="text-align:right;"> Item_MRP </th>
+   <th style="text-align:right;"> Outlet_Establishment_Year </th>
+   <th style="text-align:right;"> Outlet_SizeHigh </th>
+   <th style="text-align:right;"> Outlet_SizeMedium </th>
+   <th style="text-align:right;"> Outlet_SizeSmall </th>
+   <th style="text-align:right;"> Outlet_Location_TypeTier.1 </th>
+   <th style="text-align:right;"> Outlet_Location_TypeTier.2 </th>
+   <th style="text-align:right;"> Outlet_Location_TypeTier.3 </th>
+   <th style="text-align:right;"> Outlet_TypeGrocery.Store </th>
+   <th style="text-align:right;"> Outlet_TypeSupermarket.Type1 </th>
+   <th style="text-align:right;"> Outlet_TypeSupermarket.Type2 </th>
+   <th style="text-align:right;"> Outlet_TypeSupermarket.Type3 </th>
+   <th style="text-align:right;"> Item_Outlet_Sales </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> -0.7692004 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.9706752 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.7473513 </td>
+   <td style="text-align:right;"> 0.1395326 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3735.1380 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -1.4967248 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.9080580 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.4889359 </td>
+   <td style="text-align:right;"> 1.3340245 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 443.4228 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 0.9957995 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.9568612 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.0100396 </td>
+   <td style="text-align:right;"> 0.1395326 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 2097.2700 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1.3617141 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -1.2816826 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.6600108 </td>
+   <td style="text-align:right;"> 0.0200834 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 732.3800 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -0.8488407 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.2816826 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.3991375 </td>
+   <td style="text-align:right;"> -1.2938577 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 994.7052 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -0.5335084 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -1.2816826 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.4386493 </td>
+   <td style="text-align:right;"> 1.3340245 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 556.6088 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 0.1671105 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -1.0347518 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.3381597 </td>
+   <td style="text-align:right;"> -1.2938577 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 343.5528 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1.3186653 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.1887678 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.5336097 </td>
+   <td style="text-align:right;"> -1.5327561 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 4022.7636 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 0.7159824 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.9582752 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.7068669 </td>
+   <td style="text-align:right;"> 0.4978801 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1076.5986 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1.3617141 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.5488131 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.7519642 </td>
+   <td style="text-align:right;"> 1.0951261 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 4710.5350 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#test</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>dmy2 <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(Item_Outlet_Sales <span class="sc">~</span> ., <span class="at">data=</span>scale_test[,<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">7</span>)], <span class="at">fullrank=</span><span class="cn">TRUE</span>)  <span class="co"># test</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>dmy_test <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">predict</span>(dmy2, <span class="at">newdata=</span>scale_test))</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>dmy_test<span class="sc">$</span>Item_Outlet_Sales <span class="ot">&lt;-</span> test<span class="sc">$</span>Item_Outlet_Sales</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>dmy_test <span class="sc">%&gt;%</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kbl</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="st">"striped"</span>, <span class="at">full_width =</span> F) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> Item_Weight </th>
+   <th style="text-align:right;"> Item_Fat_ContentLF </th>
+   <th style="text-align:right;"> Item_Fat_Contentlow.fat </th>
+   <th style="text-align:right;"> Item_Fat_ContentLow.Fat </th>
+   <th style="text-align:right;"> Item_Fat_Contentreg </th>
+   <th style="text-align:right;"> Item_Fat_ContentRegular </th>
+   <th style="text-align:right;"> Item_Visibility </th>
+   <th style="text-align:right;"> Item_TypeBaking.Goods </th>
+   <th style="text-align:right;"> Item_TypeBreads </th>
+   <th style="text-align:right;"> Item_TypeBreakfast </th>
+   <th style="text-align:right;"> Item_TypeCanned </th>
+   <th style="text-align:right;"> Item_TypeDairy </th>
+   <th style="text-align:right;"> Item_TypeFrozen.Foods </th>
+   <th style="text-align:right;"> Item_TypeFruits.and.Vegetables </th>
+   <th style="text-align:right;"> Item_TypeHard.Drinks </th>
+   <th style="text-align:right;"> Item_TypeHealth.and.Hygiene </th>
+   <th style="text-align:right;"> Item_TypeHousehold </th>
+   <th style="text-align:right;"> Item_TypeMeat </th>
+   <th style="text-align:right;"> Item_TypeOthers </th>
+   <th style="text-align:right;"> Item_TypeSeafood </th>
+   <th style="text-align:right;"> Item_TypeSnack.Foods </th>
+   <th style="text-align:right;"> Item_TypeSoft.Drinks </th>
+   <th style="text-align:right;"> Item_TypeStarchy.Foods </th>
+   <th style="text-align:right;"> Item_MRP </th>
+   <th style="text-align:right;"> Outlet_Establishment_Year </th>
+   <th style="text-align:right;"> Outlet_SizeHigh </th>
+   <th style="text-align:right;"> Outlet_SizeMedium </th>
+   <th style="text-align:right;"> Outlet_SizeSmall </th>
+   <th style="text-align:right;"> Outlet_Location_TypeTier.1 </th>
+   <th style="text-align:right;"> Outlet_Location_TypeTier.2 </th>
+   <th style="text-align:right;"> Outlet_Location_TypeTier.3 </th>
+   <th style="text-align:right;"> Outlet_TypeGrocery.Store </th>
+   <th style="text-align:right;"> Outlet_TypeSupermarket.Type1 </th>
+   <th style="text-align:right;"> Outlet_TypeSupermarket.Type2 </th>
+   <th style="text-align:right;"> Outlet_TypeSupermarket.Type3 </th>
+   <th style="text-align:right;"> Item_Outlet_Sales </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1.6953421 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.1350710 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.5320040 </td>
+   <td style="text-align:right;"> 0.1395326 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -0.9844443 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.5369287 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.8618695 </td>
+   <td style="text-align:right;"> 1.0951261 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 0.3715922 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.6481452 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.6179994 </td>
+   <td style="text-align:right;"> 0.0200834 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -1.1964595 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.9834453 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.2254709 </td>
+   <td style="text-align:right;"> 1.0951261 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 0.1563483 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.0168508 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1.4971838 </td>
+   <td style="text-align:right;"> -1.5327561 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -0.6615785 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.0448628 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.3828753 </td>
+   <td style="text-align:right;"> -0.0993658 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1.3940007 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.3191900 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.4594827 </td>
+   <td style="text-align:right;"> 1.3340245 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -0.7918010 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.9758073 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.9624009 </td>
+   <td style="text-align:right;"> -1.5327561 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -1.4138559 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 1.1092216 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.7266019 </td>
+   <td style="text-align:right;"> 0.4978801 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> -1.4827339 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -1.1712431 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0.7370465 </td>
+   <td style="text-align:right;"> 1.0951261 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<ul>
+<li>train 데이터와 test 데이터의 <strong>범주형 변수를 더미화</strong>시켜 줍니다. 1번째, 7번째 변수는 상품ID와 마트ID로 더미화를 하지 않아도 됩니다.</li>
+</ul>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
+<ul>
+<li>Ridge와 Lasso를 적합한 후 최적의 모수를 탐색합니다.</li>
+</ul>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">(1) Ridge</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">(2) Lasso</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-23_ae0944e7af48d6c9492cb9f59d9bbb7f">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 최적의 lambda</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>lambdas <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="sc">-</span><span class="dv">3</span>,<span class="dv">3</span>,<span class="at">length=</span><span class="dv">50</span>) </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1023</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>cv_ridge <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(<span class="fu">model.matrix</span>(Item_Outlet_Sales <span class="sc">~</span> ., dmy_train)[,<span class="sc">-</span><span class="dv">1</span>], dmy_train<span class="sc">$</span>Item_Outlet_Sales,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> lambdas, <span class="at">standardize =</span> <span class="cn">FALSE</span>) <span class="co"># ridge : alpha=0</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>cv_ridge<span class="sc">$</span>lambda<span class="fl">.1</span>se <span class="co">#1 se rule lambda</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 25.59548</code></pre>
+</div>
+</div>
+<ul>
+<li><p>MSE를 가장 작게 해주는 최적의 lambda값을 찾기 위해 0.03 ~ 3000 사이의 모수 50개를 이용하여 <strong>cross-validation을 수행</strong>하였습니다.</p></li>
+<li><p>최종 모수는 <strong>1 se rule</strong>을 적용한 lambda값(25.595)을 선택하였습니다.</p></li>
+</ul>
+<blockquote class="blockquote">
+<p>(p.s) Breiman (1984) suggested that in actual practice, it’s common to instead use the smallest tree within 1 standard error (SE) of the minimum CV error (this is called the 1-SE rule).</p>
+</blockquote>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-24_daf3ad093a3b9a4bbe5bad504c331c98">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 최적의 lambda로 재적합</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1023</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>ridge_reg <span class="ot">&lt;-</span> <span class="fu">glmnet</span>(<span class="fu">model.matrix</span>(Item_Outlet_Sales<span class="sc">~</span>.,dmy_train)[,<span class="sc">-</span><span class="dv">1</span>],</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                    dmy_train<span class="sc">$</span>Item_Outlet_Sales, <span class="at">alpha =</span> <span class="dv">0</span>, <span class="at">lambda =</span> cv_ridge<span class="sc">$</span>lambda<span class="fl">.1</span>se)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">#coef(ridge_reg,s = "lambda.min")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-25_aeccefbf9c56484f693fed4137cf87bb">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>lambdas <span class="ot">&lt;-</span> <span class="dv">10</span><span class="sc">^</span><span class="fu">seq</span>(<span class="dv">3</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="at">length =</span> <span class="dv">50</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Setting alpha = 1 implements lasso regression</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1023</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>cv_lasso <span class="ot">&lt;-</span> <span class="fu">cv.glmnet</span>(<span class="fu">model.matrix</span>(Item_Outlet_Sales<span class="sc">~</span>.,dmy_train)[,<span class="sc">-</span><span class="dv">1</span>], dmy_train<span class="sc">$</span>Item_Outlet_Sales, <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">lambda =</span> lambdas, <span class="at">standardize =</span> <span class="cn">FALSE</span>) </span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 최적의 lambda 찾기</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>cv_lasso<span class="sc">$</span>lambda<span class="fl">.1</span>se</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 19.30698</code></pre>
+</div>
+</div>
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-26_97d2dfee570dc389acc4ac235376e30d">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 최적의 lambda로 재적합</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1023</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>lasso_model <span class="ot">&lt;-</span> <span class="fu">glmnet</span>(<span class="fu">model.matrix</span>(Item_Outlet_Sales<span class="sc">~</span>.,dmy_train)[,<span class="sc">-</span><span class="dv">1</span>], dmy_train<span class="sc">$</span>Item_Outlet_Sales, <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">lambda =</span> cv_lasso<span class="sc">$</span>lambda<span class="fl">.1</span>se)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">#coef(lasso_model,s = "lambda.min")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="prediction-and-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="prediction-and-evaluation">Prediction and Evaluation</h2>
+<ul>
+<li>test set에 대해 예측값을 구하고 평가를 수행합니다.</li>
+</ul>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">1. Ridge prediction</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">2. Lasso prediction</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-29_06cdaa1a8fd9beb1d0084fcbcd01df77">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1023</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co"># test mse</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>predictions_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(ridge_reg, <span class="at">s =</span> cv_ridge<span class="sc">$</span>lambda<span class="fl">.1</span>se, <span class="at">newx =</span> <span class="fu">model.matrix</span>(Item_Outlet_Sales <span class="sc">~</span> .,dmy_test)[,<span class="sc">-</span><span class="dv">1</span>]) <span class="co"># predict value</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">eval_results</span>(submission<span class="sc">$</span>Item_Outlet_Sales, predictions_test, pro_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      RMSE  Rsquared
+1 339.8704 0.9307555</code></pre>
+</div>
+</div>
+<ul>
+<li>Ridge 회귀로 예측한 결과, test MSE는 339.87, 정확도는 93% 으로 측정되었습니다.</li>
+</ul>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div class="cell" data-hash="Project_bigmart_syj_cache/html/unnamed-chunk-30_837b0f91be23a5b688628c278220a02f">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test mse</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>predictions_test <span class="ot">&lt;-</span> <span class="fu">predict</span>(lasso_model, <span class="at">s =</span> cv_lasso<span class="sc">$</span>lambda<span class="fl">.1</span>se, <span class="at">newx =</span> <span class="fu">model.matrix</span>(Item_Outlet_Sales<span class="sc">~</span>.,dmy_test)[,<span class="sc">-</span><span class="dv">1</span>]) <span class="co"># predict value</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">eval_results</span>(submission<span class="sc">$</span>Item_Outlet_Sales, predictions_test, test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      RMSE  Rsquared
+1 334.5676 0.9328994</code></pre>
+</div>
+</div>
+<ul>
+<li><p>Lasso 회귀로 예측한 결과, test MSE는 334.57, 정확도는 93.3% 으로 측정되었습니다.</p></li>
+<li><p>Ridge와 Lasso의 성능은 거의 비슷하지만, Lasso의 test MSE가 좀 더 낮게 추정됨을 알 수 있습니다.</p></li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

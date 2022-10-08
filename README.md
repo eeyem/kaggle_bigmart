@@ -4,7 +4,7 @@
 
 🔗 [분석 보고서](https://eeyem.github.io/kaggle_bigmart/Project_bigmart_syj.html) 
 
-![슬라이드1](./image/busan.jpg)
+![슬라이드1](ppt_image/슬라이드3.PNG))
 
 ## ✔️ 개요
 
@@ -13,7 +13,7 @@
 - 데이터 출처 : Kaggle, 각 다른 도시에 있는 10개의 점포에 대한 1559개의 상품 데이터
 - 기여 내용 : 데이터 분석, 시각화, 교내 프로젝트 발표
 
-![슬라이드3](ppt_image/슬라이드3.PNG)
+![슬라이드3](ppt_image/bigmart.PNG)
 
 ## ✔️ 프로젝트 내용
 
@@ -21,9 +21,7 @@
 
 ---
 
-![슬라이드4.PNG](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/978570c0-f35f-48ad-9e00-0fde2c7428d8/%EC%8A%AC%EB%9D%BC%EC%9D%B4%EB%93%9C4.png)
-
-![슬라이드5.PNG](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f084f999-c8ff-4d03-8466-143ccd793d24/%EC%8A%AC%EB%9D%BC%EC%9D%B4%EB%93%9C5.png)
+![슬라이드4.PNG](<h1 align="center"> 빅마트 제품 정보를 이용한 상품 가격 예측 </h1>
 
 - 결측치가 발생한 상품 무게(Item_Identifier)와 마트 규모(Outlet_Size)변수에 대해 미기입인지, 누락인지 가설 수립 및 EDA를 통한 분석
     - 가설1 : 마트분류에 따라 규모가 제한될 수 있다. 이를 테면, 동네 슈퍼와 같은 경우 보편적으로 작게 운영되기 때문이다.

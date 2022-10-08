@@ -4,7 +4,7 @@
 
 🔗 [분석 보고서](https://eeyem.github.io/kaggle_bigmart/Project_bigmart_syj.html) 
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b9b6876e-2a35-42bc-81c7-876b78342b50/Untitled.png)
+![슬라이드1](./image/busan.jpg)
 
 ## ✔️ 개요
 
@@ -13,7 +13,7 @@
 - 데이터 출처 : Kaggle, 각 다른 도시에 있는 10개의 점포에 대한 1559개의 상품 데이터
 - 기여 내용 : 데이터 분석, 시각화, 교내 프로젝트 발표
 
-![슬라이드3.PNG](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/783e20d4-cd62-4c2a-9eee-c3454dc1d3af/%EC%8A%AC%EB%9D%BC%EC%9D%B4%EB%93%9C3.png)
+![슬라이드3](./ppt_image/슬라이드3.jpg)
 
 ## ✔️ 프로젝트 내용
 
